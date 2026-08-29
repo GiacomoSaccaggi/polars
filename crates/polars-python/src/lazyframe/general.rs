@@ -439,6 +439,20 @@ impl PyLazyFrame {
     }
 
     #[staticmethod]
+    #[pyo3(signature = (resolver))]
+    fn from_lazyframe_resolver(resolver: Py<PyAny>) -> PyResult<Self> {
+        let lf = LazyFrame::from(
+            DslBuilder::from_dsl_resolver(Arc::new(DslResolver::new_python(PythonObject(
+                resolver,
+            ))))
+            .build(),
+        )
+        .into();
+
+        Ok(lf)
+    }
+
+    #[staticmethod]
     #[pyo3(signature = (schema, scan_fn, pyarrow, validate_schema, is_pure, *, explain_name=None, explain_detail=None))]
     fn scan_from_python_function_arrow_schema(
         schema: &Bound<'_, PyList>,
